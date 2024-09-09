@@ -7,6 +7,7 @@ This is a basic customizable HTML/Javascript weather overlay for OBS that displa
 - **Real-time Weather Display**: Displays the current weather conditions for a specified city.
 - **Customizable**: Configure the API key, city, and temperature units via query parameters.
 - **Simple and Clean Design**: A visually appealing overlay with a modern, semi-transparent background and rounded corners.
+- **Automatically updates**: The widget will automatically update every 10 minutes.
 
 ## Usage
 
