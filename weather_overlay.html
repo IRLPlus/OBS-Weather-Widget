@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible=IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Overlay</title>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        #weather-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #weather-icon {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+        }
+        #temperature {
+            font-size: 28px;
+            margin: 0;
+        }
+        #description {
+            font-size: 18px;
+            margin: 5px 0 0 0;
+            text-transform: capitalize;
+        }
+    </style>
+</head>
+<body>
+    <div id="weather-info">
+        <img id="weather-icon" src="" alt="Weather Icon">
+        <div>
+            <p id="temperature">Loading...</p>
+            <p id="description"></p>
+        </div>
+    </div>
+
+    <script>
+        function getQueryParam(param) {
+            return new URLSearchParams(window.location.search).get(param);
+        }
+
+        const apiKey = getQueryParam('api_key');
+        const city = getQueryParam('city');
+        const units = getQueryParam('units') || 'metric';
+
+        if (!apiKey || !city) {
+            document.getElementById('temperature').textContent = 'Missing API key or city';
+        } else {
+            async function fetchWeather() {
+                try {
+                    const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}&aqi=no`);
+                    if (!response.ok) throw new Error(`Error: ${response.statusText} (${response.status})`);
+
+                    const data = await response.json();
+                    if (!data.current) throw new Error('Invalid weather data received.');
+
+                    const temperature = units === 'metric' ? data.current.temp_c : data.current.temp_f;
+                    const description = data.current.condition.text;
+                    const icon = data.current.condition.icon;
+
+                    document.getElementById('temperature').textContent = `${temperature}° ${units === 'metric' ? 'C' : 'F'}`;
+                    document.getElementById('description').textContent = description;
+                    document.getElementById('weather-icon').src = `https:${icon}`;
+                } catch (error) {
+                    console.error('Error fetching weather:', error);
+                    document.getElementById('temperature').textContent = `Error fetching weather: ${error.message}`;
+                }
+            }
+
+            setInterval(fetchWeather, 600000);
+            fetchWeather();
+        }
+    </script>
+</body>
+</html>
